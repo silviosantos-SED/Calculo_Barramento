@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cálculo de Barramento</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+    input, select { margin: 5px; padding: 5px; }
+    button { padding: 8px 12px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+  </style>
+</head>
+<body>
+
+<h2>Cálculo de Barramento (kg)</h2>
+
+<!-- AJUDA -->
+<div class="box">
+  <h3 style="font-size:16px;">Ajuda - Padrão de Barramento</h3>
+  <div style="font-size:13px;">
+    <p><strong>Até 450A:</strong> 1.1/4" x 1/4"</p>
+    <p><strong>Até 250A:</strong> 3/4" x 1/4"</p>
+    <p><strong>Até 125A:</strong> 5/8" x 3/16"</p>
+    <p><strong>Mini Din 63A:</strong> 3/8" x 1/16"</p>
+    <p><strong>Mini Din 100A:</strong> 1/2" x 3/16"</p>
+  </div>
+</div>
+
+<!-- OPÇÃO RÁPIDA -->
+<div class="box">
+  <h3>Opção Rápida</h3>
+  <select id="modelo">
+    <option value="">Selecione</option>
+    <option value="1.1/4x1/4">450A</option>
+    <option value="3/4x1/4">250A</option>
+    <option value="5/8x3/16">125A</option>
+    <option value="3/8x1/16">63A</option>
+    <option value="1/2x3/16">100A</option>
+  </select>
+  <input type="number" step="0.01" id="comprimentoRapido" placeholder="Comprimento (m)">
+  <button onclick="calcularRapido()">Adicionar</button>
+</div>
+
+<!-- MANUAL -->
+<div class="box">
+  <h3>Manual</h3>
+  <select id="largura">
+    <option value="">Largura</option>
+    <option>3/8</option>
+    <option>1/2</option>
+    <option>5/8</option>
+    <option>3/4</option>
+    <option>1</option>
+    <option>1.1/4</option>
+    <option>1.1/2</option>
+  </select>
+
+  <select id="espessura">
+    <option value="">Espessura</option>
+    <option>1/16</option>
+    <option>1/8</option>
+    <option>3/16</option>
+    <option>1/4</option>
+  </select>
+
+  <input type="number" step="0.01" id="comprimentoManual" placeholder="Comprimento (m)">
+  <button onclick="calcularManual()">Adicionar</button>
+</div>
+
+<!-- TABELA -->
+<div class="box">
+  <h3>Lista</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Largura</th>
+        <th>Espessura</th>
+        <th>Comprimento (m)</th>
+        <th>Peso (kg)</th>
+      </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+  </table>
+</div>
+
+<!-- TOTAL -->
+<div class="box">
+  <h3>Total</h3>
+  <p id="resultado">0 kg</p>
+</div>
+
+<script>
+let totalKg = 0;
+const densidade = 0.00000896;
+
+// converte fração tipo "1.1/4" ou "3/8"
+function parseFracao(str){
+  if(str.includes(".")){
+    let [inteiro, frac] = str.split(".");
+    let [num, den] = frac.split("/");
+    return parseFloat(inteiro) + (num/den);
+  }
+  if(str.includes("/")){
+    let [num, den] = str.split("/");
+    return num/den;
+  }
+  return parseFloat(str);
+}
+
+function polegadaParaMm(v){ return v * 25.4; }
+
+function adicionarLinha(l,e,c,peso){
+  const tabela = document.getElementById("tabela");
+  tabela.innerHTML += `
+  <tr>
+    <td>${l}"</td>
+    <td>${e}"</td>
+    <td>${c}</td>
+    <td>${peso.toFixed(3)}</td>
+  </tr>`;
+}
+
+function calcularRapido(){
+  const modelo = document.getElementById("modelo").value;
+  const comp = parseFloat(document.getElementById("comprimentoRapido").value);
+
+  if(!modelo || !comp) return alert("Preencha os campos");
+
+  let [l,e] = modelo.split("x");
+
+  let largura = polegadaParaMm(parseFracao(l));
+  let esp = polegadaParaMm(parseFracao(e));
+  let comprimento = comp * 1000;
+
+  let peso = largura * esp * comprimento * densidade;
+
+  totalKg += peso;
+  adicionarLinha(l,e,comp,peso);
+  atualizar();
+}
+
+function calcularManual(){
+  const l = document.getElementById("largura").value;
+  const e = document.getElementById("espessura").value;
+  const comp = parseFloat(document.getElementById("comprimentoManual").value);
+
+  if(!l || !e || !comp) return alert("Preencha os campos");
+
+  let largura = polegadaParaMm(parseFracao(l));
+  let esp = polegadaParaMm(parseFracao(e));
+  let comprimento = comp * 1000;
+
+  let peso = largura * esp * comprimento * densidade;
+
+  totalKg += peso;
+  adicionarLinha(l,e,comp,peso);
+  atualizar();
+}
+
+function atualizar(){
+  document.getElementById("resultado").innerText = totalKg.toFixed(3) + " kg";
+}
+</script>
+
+</body>
+</html>
