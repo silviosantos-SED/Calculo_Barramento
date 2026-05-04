@@ -9,23 +9,35 @@ body {
   font-family: Arial;
   padding: 20px;
   margin-right: 260px;
+  background: #f0f6ff;
 }
 
 .box {
-  border: 1px solid #ccc;
+  border: 1px solid #3b82f6;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 8px;
+  background: #ffffff;
 }
 
 input, select {
   margin: 5px;
   padding: 6px;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
 }
 
 button {
   padding: 8px 12px;
   cursor: pointer;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+button:hover {
+  background: #1d4ed8;
 }
 
 table {
@@ -35,13 +47,20 @@ table {
 }
 
 th, td {
-  border: 1px solid #ccc;
+  border: 1px solid #93c5fd;
   padding: 8px;
   text-align: center;
 }
 
+/* 🔵 CABEÇALHO AZUL ESCURO */
 th {
-  background: #f4f4f4;
+  background: #1e3a8a;
+  color: white;
+}
+
+/* efeito zebrado */
+tr:nth-child(even) {
+  background: #eff6ff;
 }
 
 /* AJUDA FIXA */
@@ -51,22 +70,27 @@ th {
   top: 10px;
   width: 220px;
   font-size: 12px;
-  background: #fafafa;
+  background: #e0edff;
+  border: 1px solid #3b82f6;
 }
 
-/* TOTAL DESTACADO */
+/* TOTAL */
 .total {
   font-size: 20px;
   font-weight: bold;
-  color: green;
+  color: #1d4ed8;
 }
 
 /* BOTÃO REMOVER */
 .btn-remover {
-  background: red;
+  background: #dc2626;
   color: white;
   border: none;
   padding: 4px 8px;
+}
+
+.btn-remover:hover {
+  background: #b91c1c;
 }
 </style>
 
@@ -75,7 +99,7 @@ th {
 
 <h2>Cálculo de Barramento (kg)</h2>
 
-<!-- AJUDA FIXA -->
+<!-- AJUDA -->
 <div class="box ajuda-fixa">
   <h3>Ajuda</h3>
   <p><b>450A:</b> 1 1/4" x 1/4"</p>
@@ -172,6 +196,10 @@ function parseFracao(str){
 
 function polegadaParaMm(v){ return v * 25.4; }
 
+function formatarFracao(txt){
+  return txt.replace(".", " ");
+}
+
 function adicionarLinha(l,e,c,peso){
   const tabela = document.getElementById("tabela");
 
@@ -186,10 +214,6 @@ function adicionarLinha(l,e,c,peso){
   `;
 
   tabela.appendChild(linha);
-}
-
-function formatarFracao(txt){
-  return txt.replace(".", " ");
 }
 
 function removerLinha(btn, peso){
