@@ -103,10 +103,26 @@ tr:nth-child(even) {
   <p><b>100A:</b> 1/2" x 3/16"</p>
 </div>
 
+<!-- OPÇÃO RÁPIDA -->
+<div class="box">
+  <h3>Opção Rápida</h3>
+
+  <select id="modelo">
+    <option value="">Selecione</option>
+    <option value="1.1/4x1/4">450A</option>
+    <option value="3/4x1/4">250A</option>
+    <option value="5/8x3/16">125A</option>
+    <option value="3/8x1/16">63A</option>
+    <option value="1/2x3/16">100A</option>
+  </select>
+
+  <input type="number" step="0.01" id="comprimentoRapido" placeholder="Comprimento (m)">
+  <button onclick="calcularRapido()">Adicionar</button>
+</div>
+
 <div class="box">
   <h3>Manual</h3>
 
-  <!-- LARGURA -->
   <select id="largura">
     <option value="">Largura</option>
     <option>3/8</option>
@@ -132,7 +148,6 @@ tr:nth-child(even) {
     <option>5.1/2</option>
   </select>
 
-  <!-- ESPESSURA -->
   <select id="espessura">
     <option value="">Espessura</option>
     <option>1/16</option>
@@ -220,6 +235,26 @@ function removerLinha(btn, peso){
 function limpar(){
   document.getElementById("tabela").innerHTML = "";
   totalKg = 0;
+  atualizar();
+}
+
+// NOVA FUNÇÃO - OPÇÃO RÁPIDA
+function calcularRapido(){
+  const modelo = document.getElementById("modelo").value;
+  const comp = parseFloat(document.getElementById("comprimentoRapido").value);
+
+  if(!modelo || !comp) return alert("Selecione o modelo e comprimento");
+
+  const [l,e] = modelo.split("x");
+
+  let largura = polegadaParaMm(parseFracao(l));
+  let esp = polegadaParaMm(parseFracao(e));
+  let comprimento = comp * 1000;
+
+  let peso = largura * esp * comprimento * densidade;
+
+  totalKg += peso;
+  adicionarLinha(l,e,comp,peso);
   atualizar();
 }
 
