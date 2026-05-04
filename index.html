@@ -1,32 +1,88 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Calculadora de Barramento</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-    input, select { margin: 5px; padding: 5px; }
-    button { padding: 8px 12px; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #f4f4f4; }
-  </style>
+<meta charset="UTF-8">
+<title>Calculadora de Barramento</title>
+
+<style>
+body {
+  font-family: Arial;
+  padding: 20px;
+  margin-right: 260px;
+}
+
+.box {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+input, select {
+  margin: 5px;
+  padding: 6px;
+}
+
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #f4f4f4;
+}
+
+/* AJUDA FIXA */
+.ajuda-fixa {
+  position: fixed;
+  right: 10px;
+  top: 10px;
+  width: 220px;
+  font-size: 12px;
+  background: #fafafa;
+}
+
+/* TOTAL DESTACADO */
+.total {
+  font-size: 20px;
+  font-weight: bold;
+  color: green;
+}
+
+/* BOTÃO REMOVER */
+.btn-remover {
+  background: red;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+}
+</style>
+
 </head>
 <body>
 
 <h2>Cálculo de Barramento (kg)</h2>
 
-<!-- AJUDA -->
-<div class="box">
-  <h3 style="font-size:16px;">Ajuda - Padrão de Barramento</h3>
-  <div style="font-size:13px;">
-    <p><strong>Até 450A:</strong> 1.1/4" x 1/4"</p>
-    <p><strong>Até 250A:</strong> 3/4" x 1/4"</p>
-    <p><strong>Até 125A:</strong> 5/8" x 3/16"</p>
-    <p><strong>Mini Din 63A:</strong> 3/8" x 1/16"</p>
-    <p><strong>Mini Din 100A:</strong> 1/2" x 3/16"</p>
-  </div>
+<!-- AJUDA FIXA -->
+<div class="box ajuda-fixa">
+  <h3>Ajuda</h3>
+  <p><b>450A:</b> 1 1/4" x 1/4"</p>
+  <p><b>250A:</b> 3/4" x 1/4"</p>
+  <p><b>125A:</b> 5/8" x 3/16"</p>
+  <p><b>63A:</b> 3/8" x 1/16"</p>
+  <p><b>100A:</b> 1/2" x 3/16"</p>
 </div>
 
 <!-- OPÇÃO RÁPIDA -->
@@ -40,6 +96,7 @@
     <option value="3/8x1/16">63A</option>
     <option value="1/2x3/16">100A</option>
   </select>
+
   <input type="number" step="0.01" id="comprimentoRapido" placeholder="Comprimento (m)">
   <button onclick="calcularRapido()">Adicionar</button>
 </div>
@@ -47,6 +104,7 @@
 <!-- MANUAL -->
 <div class="box">
   <h3>Manual</h3>
+
   <select id="largura">
     <option value="">Largura</option>
     <option>3/8</option>
@@ -80,23 +138,25 @@
         <th>Espessura</th>
         <th>Comprimento (m)</th>
         <th>Peso (kg)</th>
+        <th>Ação</th>
       </tr>
     </thead>
     <tbody id="tabela"></tbody>
   </table>
+
+  <button onclick="limpar()">Limpar Tudo</button>
 </div>
 
 <!-- TOTAL -->
 <div class="box">
   <h3>Total</h3>
-  <p id="resultado">0 kg</p>
+  <p id="resultado" class="total">0 kg</p>
 </div>
 
 <script>
 let totalKg = 0;
 const densidade = 0.00000896;
 
-// converte fração tipo "1.1/4" ou "3/8"
 function parseFracao(str){
   if(str.includes(".")){
     let [inteiro, frac] = str.split(".");
@@ -114,13 +174,34 @@ function polegadaParaMm(v){ return v * 25.4; }
 
 function adicionarLinha(l,e,c,peso){
   const tabela = document.getElementById("tabela");
-  tabela.innerHTML += `
-  <tr>
-    <td>${l}"</td>
-    <td>${e}"</td>
+
+  const linha = document.createElement("tr");
+
+  linha.innerHTML = `
+    <td>${formatarFracao(l)}"</td>
+    <td>${formatarFracao(e)}"</td>
     <td>${c}</td>
     <td>${peso.toFixed(3)}</td>
-  </tr>`;
+    <td><button class="btn-remover" onclick="removerLinha(this, ${peso})">X</button></td>
+  `;
+
+  tabela.appendChild(linha);
+}
+
+function formatarFracao(txt){
+  return txt.replace(".", " ");
+}
+
+function removerLinha(btn, peso){
+  btn.parentElement.parentElement.remove();
+  totalKg -= peso;
+  atualizar();
+}
+
+function limpar(){
+  document.getElementById("tabela").innerHTML = "";
+  totalKg = 0;
+  atualizar();
 }
 
 function calcularRapido(){
